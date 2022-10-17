@@ -16,10 +16,10 @@
   <HelloWorld msg="Vite + Vue" />
 </template>
 
-<style scoped>
+<style lang="less" scoped>
   .logo {
-    height: 6em;
-    padding: 1.5em;
+    width: 75px;
+    // padding: 10px;
     will-change: filter;
   }
   .logo:hover {
