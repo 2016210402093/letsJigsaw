@@ -1,15 +1,19 @@
 <script setup lang="ts">
   import { reactive, ref } from 'vue'
   import TouchView from '@/components/TouchView.vue'
+  import getResolvableArr from '@/apis/getResolvableArr'
 
   // 难度级别
-  const level = ref(4)
+  const level = ref(3)
+
+  const blankNum = level.value * level.value - 1
 
   const WH = ref(`${(100 / level.value).toFixed(6)}%`)
 
   // 打乱的数组 后续需要保证有解
   // const puzzleArray = [8, 1, 4, 2, 3, 6, 5, 0, 7]
-  const puzzleArray = [13, 8, 14, 1, 15, 4, 2, 9, 3, 10, 6, 11, 5, 12, 0, 7]
+  const puzzleArray = getResolvableArr(level.value, level.value)
+  console.log(puzzleArray)
 
   interface PlateConfig {
     x: number
@@ -22,20 +26,13 @@
   const plates: PlateConfig[] = reactive([])
 
   const initPlates = () => {
-    let row = 0
-    let col = 0
-    puzzleArray.forEach((item) => {
+    puzzleArray.forEach((item: number) => {
       plates.push({
-        x: row,
-        y: col,
+        x: Math.floor(item / level.value),
+        y: item % level.value,
         puzzleNum: item,
         rotateNum: Math.floor(Math.random() * 4)
       })
-      row++
-      if (row >= level.value) {
-        row = 0
-        col++
-      }
     })
   }
 
@@ -75,8 +72,8 @@
       tarY = curY
     }
     if (tarX >= level.value || tarX < 0 || tarY >= level.value || tarY < 0) return
-    else {
-      const tarIndex = tarX * level.value + tarY
+    const tarIndex = tarX * level.value + tarY
+    if (plates[tarIndex].puzzleNum === blankNum) {
       const temp = plates[index]
       plates[index] = plates[tarIndex]
       plates[tarIndex] = temp
@@ -100,6 +97,7 @@
       }"
     >
       <div
+        v-if="item.puzzleNum !== blankNum"
         class="backgrond"
         :data-index="index"
         :style="{
@@ -107,6 +105,7 @@
           backgroundPosition: `${getBackgroundPosition(item.y)} ${getBackgroundPosition(item.x)}`
         }"
       />
+      <div v-else class="empty" :data-index="index" />
     </div>
   </TouchView>
 </template>
@@ -115,7 +114,7 @@
   .pannel {
     width: 360px;
     height: 360px;
-    background-color: white;
+    background-color: pink;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -125,6 +124,12 @@
       flex: 0 0 auto;
       box-sizing: border-box;
       border: 1px solid #fff;
+
+      .empty {
+        width: 100%;
+        height: 100%;
+        background-color: white;
+      }
 
       .backgrond {
         width: 100%;
