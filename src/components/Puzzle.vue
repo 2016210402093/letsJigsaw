@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import { reactive, ref } from 'vue'
   import TouchView from '@/components/TouchView.vue'
-  import getResolvableArr from '@/apis/getResolvableArr'
+  import getResolvableArr from '../apis/getResolvableArr'
 
   // 难度级别
   const level = ref(3)
@@ -82,7 +82,17 @@
 
   initPlates()
 
-  console.log(plates)
+  const checkPuzzle = () => {
+    let isOk = true
+    for (let index = 0; index < plates.length; index++) {
+      if (plates[index].puzzleNum !== index || plates[index].rotateNum !== 0) {
+        isOk = false
+        break
+      }
+    }
+    console.log(isOk ? '完成' : '未完成')
+    return isOk
+  }
 </script>
 
 <template>
@@ -108,6 +118,8 @@
       <div v-else class="empty" :data-index="index" />
     </div>
   </TouchView>
+
+  <button @click="checkPuzzle">完成</button>
 </template>
 
 <style lang="less" scoped>
@@ -136,7 +148,7 @@
         height: 100%;
         background: url('@/assets/test.jpg') no-repeat;
         background-attachment: fixed;
-        background-size: 375px 375px;
+        background-size: 360px 360px;
       }
     }
   }
