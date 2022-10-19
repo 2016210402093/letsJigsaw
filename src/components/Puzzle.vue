@@ -126,7 +126,7 @@
   .pannel {
     width: 360px;
     height: 360px;
-    background-color: pink;
+    background-color: white;
     display: flex;
     justify-content: center;
     align-items: center;

@@ -11,7 +11,15 @@ const routes: Array<RouteRecordRaw> = [
     meta: {
       title: '首页'
     },
-    component: () => import('@/views/home.vue')
+    component: () => import('@/views/Home.vue')
+  },
+  {
+    path: '/levelone',
+    name: 'levelone',
+    meta: {
+      title: '第一关'
+    },
+    component: () => import('@/views/LevelOne.vue')
   }
 ]
 
