@@ -52,6 +52,10 @@
         -webkit-animation: vibrate-1 0.5s linear infinite both;
         animation: vibrate-1 0.5s linear infinite both;
       }
+      .start_btn:active {
+        margin-top: 10px;
+      }
+
       @-webkit-keyframes vibrate-1 {
         0% {
           -webkit-transform: translate(0);

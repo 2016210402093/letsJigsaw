@@ -3,19 +3,20 @@
   import Header from '@/components/Header.vue'
   import { ref } from 'vue'
 
-  const speed = ref(0)
+  const start = ref(false)
+  const puzzle = ref()
 
-  const test = () => {
-    console.log(1111)
-    speed.value = 0.3333333
+  const checkPuzzle = () => {
+    puzzle.value.checkPuzzle()
   }
 </script>
 
 <template>
   <div class="level_one">
-    <button @click="test">test</button>
-    <Header :speed="speed" />
-    <Puzzle />
+    <Header :start="start" />
+    <Puzzle ref="puzzle" />
+    <img class="btn" v-if="!start" @click="start = true" src="@/assets/begin.jpg" alt="开始" />
+    <img class="btn" v-else @click="checkPuzzle" src="@/assets/finish.jpg" alt="完成" />
   </div>
 </template>
 
@@ -27,5 +28,19 @@
     width: 100vw;
     height: 100vh;
     background-color: #cc462b;
+
+    .btn {
+      display: block;
+      width: 120px;
+      height: 70px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px #6b473f;
+      margin-top: 50px;
+    }
+
+    .btn:active {
+      width: 132px;
+      height: 77px;
+    }
   }
 </style>

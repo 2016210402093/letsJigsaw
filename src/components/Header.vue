@@ -1,34 +1,40 @@
 <script setup lang="ts">
-  import { ref, toRefs } from 'vue'
+  import { ref, watch } from 'vue'
 
   const props = defineProps({
-    speed: {
-      type: Number,
-      default: 0
+    start: {
+      type: Boolean,
+      value: false
     }
   })
 
-  const { speed } = toRefs(props)
+  const currentRate = ref(99)
+  const rate = ref<number | string>(100)
+  // let timer: any = null
+  // const second = ref(0)
+  // const minute = ref(5)
 
-  const currentRate = ref(100)
-  const rate = 0
   const gradientColor = {
-    '0%': '#3fecff',
-    '100%': '#6149f6'
+    '0%': '#ff8000',
+    '100%': '#ebdf87'
   }
+
+  watch(
+    () => props.start,
+    () => {
+      if (props.start === true) rate.value = 0
+    },
+    { immediate: true }
+  )
 </script>
 
 <template>
   <div class="header">
-    {{ speed }}
-    {{ currentRate }}
-    {{ rate }}
     <van-circle
       v-model:current-rate="currentRate"
-      :speed="speed"
+      :speed="0.33"
       :rate="rate"
       :color="gradientColor"
-      text="渐变色"
     >
       <img class="clock" src="@/assets/clock_1.svg" alt="闹钟" />
     </van-circle>
@@ -37,12 +43,13 @@
 
 <style lang="less" scoped>
   .header {
-    padding: 10px;
+    padding: 20px 0 20px 0;
     display: flex;
     align-items: center;
     justify-content: center;
 
     .clock {
+      color: #ff8000;
       width: 50px;
       height: 50px;
       margin: 25px auto;

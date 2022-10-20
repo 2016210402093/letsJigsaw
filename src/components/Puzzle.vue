@@ -93,6 +93,10 @@
     console.log(isOk ? '完成' : '未完成')
     return isOk
   }
+
+  defineExpose({
+    checkPuzzle
+  })
 </script>
 
 <template>
@@ -118,8 +122,6 @@
       <div v-else class="empty" :data-index="index" />
     </div>
   </TouchView>
-
-  <button @click="checkPuzzle">完成</button>
 </template>
 
 <style lang="less" scoped>
