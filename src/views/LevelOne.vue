@@ -1,22 +1,98 @@
 <script setup lang="ts">
   import Puzzle from '@/components/Puzzle.vue'
   import Header from '@/components/Header.vue'
-  import { ref } from 'vue'
+  import { reactive, ref } from 'vue'
+  import unCompletedImg from '@/assets/notok.svg'
+  import { useRouter } from 'vue-router'
 
   const start = ref(false)
   const puzzle = ref()
+  const header = ref()
+  const router = useRouter()
+
+  const dialog = reactive({
+    show: false,
+    text: '',
+    imgSrc: unCompletedImg,
+    showcancelBtn: false,
+    confirmText: '确定',
+    cancelText: '取消',
+    confirmFn: () => {},
+    cancelFn: () => {}
+  })
+
+  const closeDialog = () => {
+    dialog.show = false
+  }
+
+  const restart = () => {
+    start.value = false
+    dialog.show = false
+    header.value.restart()
+    puzzle.value.restart()
+  }
+
+  const redirectHome = () => {
+    dialog.show = false
+    router.go(-1)
+  }
+
+  const onTimeout = () => {
+    console.log('in timerout')
+    dialog.show = true
+    dialog.text = '时间到了！'
+    dialog.imgSrc = unCompletedImg
+    dialog.showcancelBtn = true
+    dialog.confirmText = '再来一次'
+    dialog.cancelText = '返回首页'
+    dialog.confirmFn = restart
+    dialog.cancelFn = redirectHome
+  }
 
   const checkPuzzle = () => {
-    puzzle.value.checkPuzzle()
+    const result = puzzle.value.checkPuzzle()
+
+    if (result === false) {
+      dialog.show = true
+      dialog.showcancelBtn = false
+      dialog.confirmFn = closeDialog
+      dialog.text = '您还未完成拼图哦！'
+      dialog.imgSrc = unCompletedImg
+      dialog.confirmText = '确定'
+    }
   }
 </script>
 
 <template>
   <div class="level_one">
-    <Header :start="start" />
-    <Puzzle ref="puzzle" />
+    <Header ref="header" :start="start" @timeout="onTimeout" />
+    <Puzzle ref="puzzle" :start="start" />
     <img class="btn" v-if="!start" @click="start = true" src="@/assets/begin.jpg" alt="开始" />
     <img class="btn" v-else @click="checkPuzzle" src="@/assets/finish.jpg" alt="完成" />
+
+    <van-overlay :show="dialog.show">
+      <div class="wrapper">
+        <div class="dialog">
+          <p class="title">提示</p>
+          <div class="content">
+            <img class="img" :src="dialog.imgSrc" alt="未完成" />
+            <p class="msg"> {{ dialog.text }} </p>
+            <van-button plain class="button" @click="dialog.confirmFn" type="default">
+              {{ dialog.confirmText }}
+            </van-button>
+            <van-button
+              plain
+              class="button"
+              v-if="dialog.showcancelBtn"
+              @click="dialog.cancelFn"
+              type="default"
+            >
+              {{ dialog.cancelText }}
+            </van-button>
+          </div>
+        </div>
+      </div>
+    </van-overlay>
   </div>
 </template>
 
@@ -41,6 +117,71 @@
     .btn:active {
       width: 132px;
       height: 77px;
+    }
+  }
+
+  .wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+
+    .dialog {
+      width: 250px;
+      border: 6px solid orange;
+      min-height: 150px;
+      background-color: white;
+      border-radius: 15px;
+      position: relative;
+
+      .title {
+        position: absolute;
+        left: 75px;
+        top: -20px;
+        background-color: orange;
+        width: 100px;
+        height: 40px;
+        font-size: 20px;
+        text-align: center;
+        margin: unset;
+        color: #ebdf87;
+        border-radius: 8px;
+        line-height: 40px;
+        font-weight: bolder;
+        box-shadow: 0px 1px #3e3e3e, 0px 2px #3e3e3e, 0px 3px #3e3e3e, 0px 4px #3e3e3e;
+      }
+
+      .content {
+        padding: 20px 0;
+        margin: 5px;
+        border: 3px solid gray;
+        width: calc(100% - 16px);
+        height: calc(100% - 56px);
+        border-radius: 10px;
+
+        .img {
+          display: block;
+          width: 100px;
+          margin: 0 auto;
+        }
+
+        .msg {
+          width: 100%;
+          font-size: 18px;
+          font-weight: bolder;
+          text-align: center;
+        }
+
+        .button {
+          border: 3px solid;
+          margin: 10px auto;
+          display: block;
+          width: 150px;
+          border-radius: 8px;
+          font-size: 18px;
+          box-shadow: 0px 1px #3e3e3e, 0px 2px #3e3e3e, 0px 3px #3e3e3e;
+        }
+      }
     }
   }
 </style>

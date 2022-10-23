@@ -13,6 +13,13 @@
   const currentRate = ref(99)
   const rate = ref<number | string>(100)
 
+  const emit = defineEmits(['timeout'])
+
+  const restart = () => {
+    currentRate.value = 99
+    rate.value = 100
+  }
+
   const wobble = computed(() => {
     if (currentRate.value < 33 && currentRate.value > 0) return true
     else return false
@@ -32,12 +39,26 @@
   }
 
   watch(
+    () => currentRate.value,
+    () => {
+      if (currentRate.value <= 0) {
+        console.log('timerout')
+        emit('timeout')
+      }
+    }
+  )
+
+  watch(
     () => props.start,
     () => {
       if (props.start === true) rate.value = 0
     },
     { immediate: true }
   )
+
+  defineExpose({
+    restart
+  })
 </script>
 
 <template>

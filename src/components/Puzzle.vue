@@ -1,20 +1,23 @@
 <script setup lang="ts">
-  import { reactive, ref } from 'vue'
+  import { ref, toRefs } from 'vue'
   import TouchView from '@/components/TouchView.vue'
   import getResolvableArr from '../apis/getResolvableArr'
 
+  const props = defineProps({
+    start: {
+      type: Boolean,
+      value: false
+    }
+  })
+
+  const { start } = toRefs(props)
+
   // 难度级别
-  const level = ref(3)
+  const level = ref(6)
 
   const blankNum = level.value * level.value - 1
 
   const WH = ref(`${(100 / level.value).toFixed(6)}%`)
-
-  // 打乱数组 保证有解
-  const puzzleArray = getResolvableArr(level.value, level.value)
-
-  //是否显示dialog
-  const showDialog = ref(false)
 
   interface PlateConfig {
     x: number
@@ -25,11 +28,14 @@
   }
 
   // 拼图版
-  const plates: PlateConfig[] = reactive([])
+  const plates = ref<PlateConfig[]>([])
 
   const initPlates = () => {
+    // 打乱数组 保证有解
+    const puzzleArray = getResolvableArr(level.value, level.value)
+    plates.value = []
     puzzleArray.forEach((item: number) => {
-      plates.push({
+      plates.value.push({
         x: Math.floor(item / level.value),
         y: item % level.value,
         rotate: false,
@@ -37,6 +43,7 @@
         rotateNum: Math.floor(Math.random() * 4)
       })
     })
+    plates.value[plates.value.length - 1].rotateNum = 0
   }
 
   const getBackgroundPosition: (x: number) => string = (x: number) => {
@@ -45,7 +52,7 @@
   }
 
   const rotatePlate = (index: number) => {
-    const item = plates[index]
+    const item = plates.value[index]
     item.rotate = true
     console.log(item.rotate)
     item.rotateNum = (item.rotateNum + 1) % 4
@@ -81,77 +88,95 @@
     }
     if (tarX >= level.value || tarX < 0 || tarY >= level.value || tarY < 0) return
     const tarIndex = tarX * level.value + tarY
-    if (plates[tarIndex].puzzleNum === blankNum) {
-      const temp = plates[index]
-      plates[index] = plates[tarIndex]
-      plates[tarIndex] = temp
+    if (plates.value[tarIndex].puzzleNum === blankNum) {
+      const temp = plates.value[index]
+      plates.value[index] = plates.value[tarIndex]
+      plates.value[tarIndex] = temp
     }
   }
 
-  initPlates()
-
   const checkPuzzle = () => {
     let isOk = true
-    for (let index = 0; index < plates.length; index++) {
-      if (plates[index].puzzleNum !== index || plates[index].rotateNum !== 0) {
+    console.log(plates)
+    for (let index = 0; index < plates.value.length - 1; index++) {
+      if (plates.value[index].puzzleNum !== index || plates.value[index].rotateNum !== 0) {
         isOk = false
         break
       }
     }
-    if (!isOk) showDialog.value = true
     console.log(isOk ? '完成' : '未完成')
     return isOk
   }
 
+  initPlates()
+
   defineExpose({
-    checkPuzzle
+    checkPuzzle,
+    restart: initPlates
   })
 </script>
 
 <template>
-  <TouchView class="pannel" @touch-event="touchEvent">
-    <div
-      class="plate"
-      v-for="(item, index) in plates"
-      :key="item.puzzleNum"
-      :style="{
-        width: WH,
-        height: WH
-      }"
-    >
-      <div
-        v-if="item.puzzleNum !== blankNum"
-        :class="[{ rotate: item.rotate }, 'backgrond']"
-        :data-index="index"
-        :style="{
-          transform: `rotate(${item.rotateNum * 90}deg)`,
-          backgroundPosition: `${getBackgroundPosition(item.y)} ${getBackgroundPosition(item.x)}`
-        }"
-      />
-      <div v-else class="empty" :data-index="index" />
-    </div>
-  </TouchView>
-
-  <van-overlay :show="showDialog">
-    <div class="wrapper">
-      <div class="dialog">
-        <p class="title">提示</p>
-        <div class="content">
-          <img class="img" src="@/assets/notok.svg" alt="未完成" />
-          <p class="msg"> 您还未完成拼图哦！ </p>
-          <van-button plain class="button" @click="showDialog = false" type="default">
-            确定</van-button
-          ></div
+  <div class="puzzle">
+    <img class="origin_img" v-if="!start" src="@/assets/test.jpg" alt="第一关" />
+    <Transition name="fade" mode="in-out">
+      <TouchView v-if="start" class="pannel" @touch-event="touchEvent">
+        <div
+          class="plate"
+          v-for="(item, index) in plates"
+          :key="item.puzzleNum"
+          :style="{
+            width: WH,
+            height: WH
+          }"
         >
-      </div>
-    </div>
-  </van-overlay>
+          <div
+            v-if="item.puzzleNum !== blankNum"
+            :class="[{ rotate: item.rotate }, 'backgrond']"
+            :data-index="index"
+            :style="{
+              transform: `rotate(${item.rotateNum * 90}deg)`,
+              backgroundPosition: `${getBackgroundPosition(item.y)} ${getBackgroundPosition(
+                item.x
+              )}`
+            }"
+          />
+          <div v-else class="empty" :data-index="index" />
+        </div>
+      </TouchView>
+    </Transition>
+  </div>
 </template>
 
 <style lang="less" scoped>
-  .pannel {
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: opacity 1s ease;
+  }
+
+  .fade-enter-from,
+  .fade-leave-to {
+    opacity: 0;
+  }
+
+  .puzzle {
     width: 360px;
     height: 360px;
+    overflow: hidden;
+    box-shadow: 0 0 15px #3e3e3e;
+  }
+
+  .pannel_box {
+    width: 360px;
+    height: 360px;
+  }
+  .origin_img {
+    display: block;
+    .pannel_box();
+  }
+
+  .pannel {
+    .pannel_box();
     background-color: white;
     display: flex;
     justify-content: center;
@@ -174,7 +199,6 @@
         width: 100%;
         height: 100%;
         background: url('@/assets/test.jpg') no-repeat;
-        background-attachment: fixed;
         background-size: 360px 360px;
       }
     }
@@ -203,71 +227,6 @@
       100% {
         -webkit-transform: rotate(90deg);
         transform: rotate(90deg);
-      }
-    }
-  }
-
-  .wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-
-    .dialog {
-      width: 250px;
-      border: 6px solid orange;
-      min-height: 150px;
-      background-color: white;
-      border-radius: 15px;
-      position: relative;
-
-      .title {
-        position: absolute;
-        left: 75px;
-        top: -20px;
-        background-color: orange;
-        width: 100px;
-        height: 40px;
-        font-size: 20px;
-        text-align: center;
-        margin: unset;
-        color: #ebdf87;
-        border-radius: 8px;
-        line-height: 40px;
-        font-weight: bolder;
-        box-shadow: 0px 1px #3e3e3e, 0px 2px #3e3e3e, 0px 3px #3e3e3e, 0px 4px #3e3e3e;
-      }
-
-      .content {
-        padding: 20px 0;
-        margin: 5px;
-        border: 3px solid gray;
-        width: calc(100% - 16px);
-        height: calc(100% - 56px);
-        border-radius: 10px;
-
-        .img {
-          display: block;
-          width: 100px;
-          margin: 0 auto;
-        }
-
-        .msg {
-          width: 100%;
-          font-size: 18px;
-          font-weight: bolder;
-          text-align: center;
-        }
-
-        .button {
-          border: 3px solid;
-          margin: 0 auto;
-          display: block;
-          width: 150px;
-          border-radius: 8px;
-          font-size: 18px;
-          box-shadow: 0px 1px #3e3e3e, 0px 2px #3e3e3e, 0px 3px #3e3e3e;
-        }
       }
     }
   }

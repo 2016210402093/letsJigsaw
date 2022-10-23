@@ -2,7 +2,7 @@
   import { ref } from 'vue'
 
   // 精度
-  const accuracy = 25
+  const accuracy = 15
 
   const emit = defineEmits(['touchEvent'])
 
