@@ -10,7 +10,7 @@
 </script>
 
 <template>
-  <Level :title="title" :content="content" :level="2" :img="imgSrc" />
+  <Level :title="title" :content="content" :level="6" :img="imgSrc" />
 </template>
 
 <style lang="less" scoped></style>

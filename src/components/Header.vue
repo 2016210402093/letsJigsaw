@@ -6,7 +6,7 @@
   const props = defineProps({
     start: {
       type: Boolean,
-      value: false
+      default: false
     }
   })
 

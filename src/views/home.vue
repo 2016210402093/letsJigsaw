@@ -5,7 +5,7 @@
 
   const goNext = () => {
     router.push({
-      path: '/levelOne'
+      path: '/levelone'
     })
   }
 </script>

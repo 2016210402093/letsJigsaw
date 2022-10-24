@@ -20,6 +20,30 @@ const routes: Array<RouteRecordRaw> = [
       title: '第一关'
     },
     component: () => import('@/views/LevelOne.vue')
+  },
+  {
+    path: '/leveltwo',
+    name: 'leveltwo',
+    meta: {
+      title: '第二关'
+    },
+    component: () => import('@/views/LevelTwo.vue')
+  },
+  {
+    path: '/levethree',
+    name: 'levethree',
+    meta: {
+      title: '第三关'
+    },
+    component: () => import('@/views/LevelThree.vue')
+  },
+  {
+    path: '/success',
+    name: 'success',
+    meta: {
+      title: '第三关'
+    },
+    component: () => import('@/views/Success.vue')
   }
 ]
 

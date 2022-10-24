@@ -6,14 +6,21 @@
   const props = defineProps({
     start: {
       type: Boolean,
-      value: false
+      default: false
+    },
+    level: {
+      type: Number,
+      default: 1
+    },
+    img: {
+      type: String,
+      default: ''
     }
   })
 
-  const { start } = toRefs(props)
+  const { start, level, img } = toRefs(props)
 
   // 难度级别
-  const level = ref(6)
 
   const blankNum = level.value * level.value - 1
 
@@ -118,7 +125,7 @@
 
 <template>
   <div class="puzzle">
-    <img class="origin_img" v-if="!start" src="@/assets/test.jpg" alt="第一关" />
+    <img class="origin_img" v-if="!start" :src="img" alt="第一关" />
     <Transition name="fade" mode="in-out">
       <TouchView v-if="start" class="pannel" @touch-event="touchEvent">
         <div
