@@ -14,7 +14,7 @@
   <div class="home">
     <img class="game_title" src="@/assets/game_title.png" alt="拼了个图" />
     <div class="home_bg">
-      <img @click="goNext" class="start_btn" src="@/assets/start.png" alt="开始游戏" />
+      <img @click="goNext" class="start_btn" src="/start.png" alt="开始游戏" />
     </div>
   </div>
 </template>
@@ -42,6 +42,7 @@
       position: relative;
 
       .start_btn {
+        display: block;
         width: 200px;
         position: absolute;
         bottom: 95px;
@@ -53,7 +54,7 @@
         animation: vibrate-1 0.5s linear infinite both;
       }
       .start_btn:active {
-        margin-top: 10px;
+        transform: scale(1.1);
       }
 
       @-webkit-keyframes vibrate-1 {

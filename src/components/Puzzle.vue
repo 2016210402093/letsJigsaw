@@ -20,8 +20,6 @@
 
   const { start, level, img } = toRefs(props)
 
-  // 难度级别
-
   const blankNum = level.value * level.value - 1
 
   const WH = ref(`${(100 / level.value).toFixed(6)}%`)
@@ -143,6 +141,7 @@
             :data-index="index"
             :style="{
               transform: `rotate(${item.rotateNum * 90}deg)`,
+              backgroundImage: `url(${img})`,
               backgroundPosition: `${getBackgroundPosition(item.y)} ${getBackgroundPosition(
                 item.x
               )}`
@@ -205,7 +204,6 @@
       .backgrond {
         width: 100%;
         height: 100%;
-        background: url('@/assets/test.jpg') no-repeat;
         background-size: 360px 360px;
       }
     }

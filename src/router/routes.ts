@@ -30,8 +30,8 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/views/LevelTwo.vue')
   },
   {
-    path: '/levethree',
-    name: 'levethree',
+    path: '/levelthree',
+    name: 'levelthree',
     meta: {
       title: '第三关'
     },
